@@ -4,7 +4,21 @@
 
 using namespace std;
 
+int countWords(char *text);
 int countWords(char *text, char *word);
+
+int countWords(char *text){
+    char w1[] = "love";
+    char w2[] = "Love";
+    char w3[] = "hate";
+    char w4[] = "Hate";
+    int rLove = countWords(text, w1);
+    rLove += countWords(text, w2);
+    int rHate = countWords(text, w3);
+    rHate += countWords(text, w4);
+    COUNT_LOVE += rLove;
+    COUNT_HATE += rHate;
+}
 
 int countWords(char *text, char *word){
     int tSize = 0;
