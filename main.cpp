@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <chrono>
 #include "read.cpp"
+#include<fstream>
 
 using std::cout;
 using std::endl;
@@ -17,34 +18,25 @@ int COUNT_HATE = 0;
 
 void countWordsCaller(char *text, int iInitial, int iFinal);
 int countWords(char *text, char *word, int iInitial, int iFinal);
+std::chrono::duration<double> testThreads(int k);
 
 int main(){
-    int iNumBlocks = 20;
-    Text* text = new Text("data/multiplied.txt", 1);
-    int* iBlockSize = text -> blocktext(iNumBlocks);
+    char Str[100] = "arroz";
+    FILE* arq;
+    arq = fopen("ArqGrav.txt", "a");
 
-    vector<thread> threads;
-
-    int iInitial = 0;
-    int iFinal = 0;
-    auto begin = high_resolution_clock::now();
-    for (int i = 0; i < iNumBlocks; i++) {
-        iFinal = iBlockSize[i];
-        threads.push_back(std::thread(countWordsCaller, text -> cText, iInitial, iFinal));
-        iInitial = iFinal;
+    std::chrono::duration<double> tempos[100];
+    for (int i=2; i<21; i++){
+        std::chrono::duration<double> t = testThreads(i);
+        double tem = t.count();
+        fprintf(arq, "%s", "\n");
+        fprintf(arq, "%f", tem);
+        tempos[i] = t;
+        COUNT_LOVE = 0;
+        COUNT_HATE = 0;
     }
-
-    cout << "about to join" << endl;
-    for (auto& th : threads) th.join();
-
-    auto end = high_resolution_clock::now();
-    cout << duration_cast<microseconds>(end - begin).count() << endl;
-
-    cout << "Love: " << COUNT_LOVE << endl;
-    cout << "Hate: " << COUNT_HATE << endl;
-    cout << "end" << endl;
-
-    return 0;
+    fclose(arq);
+    cout<<"Cabo"<<endl;
 }
 
 void countWordsCaller(char *text, int iInitial, int iFinal){
@@ -90,4 +82,36 @@ int countWords(char *text, char *word, int iInitial, int iFinal){
     }
 
     return wTimes;
+}
+
+std::chrono::duration<double> testThreads(int k)
+{
+    int iNumBlocks = k;
+    Text* text = new Text("data/multiplied.txt", 1);
+    int* iBlockSize = text -> blocktext(iNumBlocks);
+
+    vector<thread> threads;
+
+    int iInitial = 0;
+    int iFinal = 0;
+    auto begin = high_resolution_clock::now();
+
+    for (int i = 0; i < iNumBlocks; i++) {
+        iFinal = iBlockSize[i];
+        threads.push_back(std::thread(countWordsCaller, text -> cText, iInitial, iFinal));
+        iInitial = iFinal;
+    }
+
+    for (auto& th : threads) th.join();
+
+    auto end = high_resolution_clock::now();
+
+    cout << "Love: " << COUNT_LOVE << endl;
+    cout << "Hate: " << COUNT_HATE << endl;
+
+    cout << "end" << endl;
+
+    //return duration_cast<microseconds>(end - begin).count();
+    return std::chrono::duration<double>(duration_cast<microseconds>(end - begin).count() * microseconds::period::num / static_cast<double>(microseconds::period::den));
+
 }

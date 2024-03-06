@@ -67,7 +67,7 @@ class Text{
                     iBlockLines = 0;
                 }
             }
-            
+
             iBlockSize[iBlocks - 1] = iChars - iBlockSize[iBlocks - 2];
             return iBlockSize;
         }
