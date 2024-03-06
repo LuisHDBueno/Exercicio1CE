@@ -23,10 +23,10 @@ std::chrono::duration<double> testThreads(int k);
 int main(){
     char Str[100] = "arroz";
     FILE* arq;
-    arq = fopen("ArqGrav.txt", "a");
+    arq = fopen("data//times.txt", "a");
 
     std::chrono::duration<double> tempos[100];
-    for (int i=2; i<21; i++){
+    for (int i=2; i<51; i++){
         std::chrono::duration<double> t = testThreads(i);
         double tem = t.count();
         fprintf(arq, "%s", "\n");
