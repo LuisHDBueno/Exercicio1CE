@@ -2,73 +2,85 @@
 #include <fstream>
 using namespace std;
 
-char* read(int iRepeat) {
+class Text{
+    public:
+        // Atributos
+        // Texto Completo
+        char* cText;
+        // Número de Caracteres por bloco
+        int* iBlockSize;
 
-    // rodar arquivo python com argumento iRepeat
-    string command = "python3 multiply_text.py " + to_string(iRepeat);
-    system(command.c_str());
-
-    streampos size;
-    char* memblock;
-
-    ifstream file ("data/multiplied.txt", ios::in|ios::binary|ios::ate);
-    if (file.is_open())
-    {
-        size = file.tellg();
-        memblock = new char [size];
-        file.seekg (0, ios::beg);
-        file.read (memblock, size);
-        file.close();
-    }
-    else cout << "Unable to open file";
-    return memblock;
-}
-
-char** blocktext(int iRepeat, int iBlocks){
-    char* cText = read(iRepeat);
-
-    int iLines = 0;
-    int iChars = 0;
-    while (cText[iChars] != '\0'){
-        if (cText[iChars] == '\n'){
-            iLines++;
+        Text(string path, int iRepeat = 1){
+            // Ler o arquivo
+            if (iRepeat > 1){
+                multiply(iRepeat);
+            }
+            cText = read(path);
         }
-        iChars++;
-    }
 
-    // Pegar o número de caracteres por bloco
-    int iBlockSize[iBlocks];
-    int iLinesAtBlock = 0;
-    int iBlock = 0;
-    int iCharsAtBlock = 0;
-    while (cText[iChars] != '\0'){
-        if (cText[iChars] == '\n'){
-            iLines++;
+        void multiply(int iRepeat){
+            // rodar arquivo python com argumento iRepeat
+            string command = "python3 multiply_text.py " + to_string(iRepeat);
+            system(command.c_str());
         }
-        iCharsAtBlock++;
-        if (iLinesAtBlock == iLines/iBlocks){
-            cout << iBlock << " " << iCharsAtBlock << endl;
-            iBlockSize[iBlock] = iCharsAtBlock;
-            iBlock++;
-            iLinesAtBlock = 0;
-            iCharsAtBlock = 0;
-        }
-    }
 
-    char** blocks = new char*[iBlocks];
-    for (int i = 0; i < iBlocks; i++){
-        blocks[i] = new char[iBlockSize[i]];
-        for (int j = 0; j < iBlockSize[i]; j++){
-            blocks[i][j] = cText[i*iBlockSize[i] + j];
-        }
-        cout << "foi" << endl;
-    }
-    cout << "de novo" << endl;
-    return blocks;
-}
+        char* read(string path) {
+            streampos size;
+            char* memblock;
 
+            ifstream file (path, ios::in|ios::binary|ios::ate);
+            if (file.is_open())
+            {
+                size = file.tellg();
+                memblock = new char [size];
+                file.seekg (0, ios::beg);
+                file.read (memblock, size);
+                file.close();
+            }
+            else cout << "Unable to open file";
+            return memblock;
+        }
+
+        int* blocktext(int iBlocks){
+            int iLines = 0;
+            int iChars = 0;
+            while (cText[iChars] != '\0'){
+                if (cText[iChars] == '\n'){
+                    iLines++;
+                }
+                iChars++;
+            }
+
+            // Pegar o número de caracteres por bloco
+            iBlockSize = new int[iBlocks];
+            int iBlockLines = 0;
+            int iBlockChars = 0;
+            int iBlock = 0;
+            while (cText[iBlockChars] != '\0'){
+                if (cText[iBlockChars] == '\n'){
+                    iBlockLines++;
+                }
+                iBlockChars++;
+                if (iBlockLines == iLines / iBlocks){
+                    iBlockSize[iBlock] = iBlockChars;
+                    iBlock++;
+                    iBlockLines = 0;
+                }
+            }
+            
+            iBlockSize[iBlocks - 1] = iChars - iBlockSize[iBlocks - 2];
+            return iBlockSize;
+        }
+};
+
+/* Exemplo de uso
 int main(){
-    char* cText = blocktext(2, 3)[0];
-    cout << cText;
+    Text* text = new Text("data/multiplied.txt");
+    int* iBlockSize = text -> blocktext(5);
+    cout << iBlockSize[0] << endl;
+    for (int i = 0; i < iBlockSize[0]; i++){
+        cout << text -> cText[i];
+    }
     return 0;
 }
+*/
