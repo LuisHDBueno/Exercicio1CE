@@ -3,6 +3,7 @@
 #include <vector>
 #include <windows.h>
 #include <chrono>
+#include "read.cpp"
 
 using std::cout;
 using std::endl;
@@ -14,20 +15,23 @@ using namespace std::chrono;
 int COUNT_LOVE = 0;
 int COUNT_HATE = 0;
 
-void countWordsCaller(char *text);
-int countWords(char *text, char *word);
+void countWordsCaller(char *text, int iInitial, int iFinal);
+int countWords(char *text, char *word, int iInitial, int iFinal);
 
 int main(){
-    int block[20];
-    char bloco[] = "Arroz love, I hate yooooou. Love";
-
-    for (int i = 0; i < 20; i++) block[i] = i;
+    int iNumBlocks = 20;
+    Text* text = new Text("data/multiplied.txt", 1);
+    int* iBlockSize = text -> blocktext(iNumBlocks);
 
     vector<thread> threads;
 
+    int iInitial = 0;
+    int iFinal = 0;
     auto begin = high_resolution_clock::now();
-    for (int i = 0; i < 20; i++) {
-        threads.push_back(std::thread(countWordsCaller, bloco));
+    for (int i = 0; i < iNumBlocks; i++) {
+        iFinal = iBlockSize[i];
+        threads.push_back(std::thread(countWordsCaller, text -> cText, iInitial, iFinal));
+        iInitial = iFinal;
     }
 
     cout << "about to join" << endl;
@@ -43,26 +47,23 @@ int main(){
     return 0;
 }
 
-void countWordsCaller(char *text){
+void countWordsCaller(char *text, int iInitial, int iFinal){
     char w1[] = "love";
     char w2[] = "Love";
     char w3[] = "hate";
     char w4[] = "Hate";
-    int rLove = countWords(text, w1);
-    rLove += countWords(text, w2);
-    int rHate = countWords(text, w3);
-    rHate += countWords(text, w4);
+    int rLove = countWords(text, w1, iInitial, iFinal);
+    rLove += countWords(text, w2, iInitial, iFinal);
+    int rHate = countWords(text, w3, iInitial, iFinal);
+    rHate += countWords(text, w4, iInitial, iFinal);
     COUNT_LOVE += rLove;
     COUNT_HATE += rHate;
 }
 
-int countWords(char *text, char *word){
-    int tSize = 0;
+int countWords(char *text, char *word, int iInitial, int iFinal){
+    int tSize = iFinal - iInitial;
     int wSize = 0;
-    while( text[tSize] != '\0')
-    {
-        tSize++;
-    }
+
     while( word[wSize] != '\0')
     {
         wSize++;
@@ -76,7 +77,7 @@ int countWords(char *text, char *word){
         int wCounter = 0;
         while(wCounter<wSize)
         {
-            if(text[tCounter+wCounter]!=word[wCounter]){
+            if(text[tCounter+wCounter + iInitial]!=word[wCounter]){
                 founder = false;
             }
             wCounter++;
