@@ -19,7 +19,6 @@ def plot_data(data):
     plt.title('Gráfico de Linha')
     plt.xlabel('Índice')
     plt.ylabel('Valor')
-    plt.show()
     
     # Verifica se a pasta 'fig' existe. Se não, cria a pasta.
     if not os.path.exists('fig'):
