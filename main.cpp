@@ -14,7 +14,7 @@ using namespace std::chrono;
 int COUNT_LOVE = 0;
 int COUNT_HATE = 0;
 
-void countWords(char *text);
+void countWordsCaller(char *text);
 int countWords(char *text, char *word);
 
 int main(){
@@ -27,7 +27,7 @@ int main(){
 
     auto begin = high_resolution_clock::now();
     for (int i = 0; i < 20; i++) {
-        threads.push_back(thread(countWords, bloco));
+        threads.push_back(std::thread(countWordsCaller, bloco));
     }
 
     cout << "about to join" << endl;
@@ -36,13 +36,14 @@ int main(){
     auto end = high_resolution_clock::now();
     cout << duration_cast<microseconds>(end - begin).count() << endl;
 
-    cout << COUNT_LOVE << endl;
+    cout << "Love: " << COUNT_LOVE << endl;
+    cout << "Hate: " << COUNT_HATE << endl;
     cout << "end" << endl;
 
     return 0;
 }
 
-void countWords(char *text){
+void countWordsCaller(char *text){
     char w1[] = "love";
     char w2[] = "Love";
     char w3[] = "hate";
@@ -86,7 +87,6 @@ int countWords(char *text, char *word){
         }
         tCounter++;
     }
-    cout << wTimes << endl;
 
     return wTimes;
 }
