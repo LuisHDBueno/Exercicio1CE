@@ -28,7 +28,7 @@ int main(){
     arq = fopen("data//times.txt", "a");
 
     std::chrono::duration<double> tempos[100];
-    for (int i=2; i<5; i++){
+    for (int i=2; i<51; i++){
         std::chrono::duration<double> t = testThreads(i);
         double tem = t.count();
         fprintf(arq, "%s", "\n");
