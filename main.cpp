@@ -15,18 +15,20 @@ using namespace std::chrono;
 
 int COUNT_LOVE = 0;
 int COUNT_HATE = 0;
+int arraCOUNT_LOVE[100];
+int arraCOUNT_HATE[100];
 
-void countWordsCaller(char *text, int iInitial, int iFinal);
+void countWordsCaller(char *text, int iInitial, int iFinal, int threadNumber);
 int countWords(char *text, char *word, int iInitial, int iFinal);
 std::chrono::duration<double> testThreads(int k);
 
 int main(){
-    char Str[100] = "arroz";
+
     FILE* arq;
     arq = fopen("data//times.txt", "a");
 
     std::chrono::duration<double> tempos[100];
-    for (int i=2; i<51; i++){
+    for (int i=2; i<5; i++){
         std::chrono::duration<double> t = testThreads(i);
         double tem = t.count();
         fprintf(arq, "%s", "\n");
@@ -34,12 +36,16 @@ int main(){
         tempos[i] = t;
         COUNT_LOVE = 0;
         COUNT_HATE = 0;
+        for (int j=0; j<i; j++){
+            arraCOUNT_LOVE[j] = 0;
+            arraCOUNT_HATE[j] = 0;
+        }
     }
     fclose(arq);
     cout<<"Cabo"<<endl;
 }
 
-void countWordsCaller(char *text, int iInitial, int iFinal){
+void countWordsCaller(char *text, int iInitial, int iFinal, int threadNumber){
     char w1[] = "love";
     char w2[] = "Love";
     char w3[] = "hate";
@@ -48,8 +54,8 @@ void countWordsCaller(char *text, int iInitial, int iFinal){
     rLove += countWords(text, w2, iInitial, iFinal);
     int rHate = countWords(text, w3, iInitial, iFinal);
     rHate += countWords(text, w4, iInitial, iFinal);
-    COUNT_LOVE += rLove;
-    COUNT_HATE += rHate;
+    arraCOUNT_LOVE[threadNumber] += rLove;
+    arraCOUNT_HATE[threadNumber] += rHate;
 }
 
 int countWords(char *text, char *word, int iInitial, int iFinal){
@@ -89,7 +95,6 @@ std::chrono::duration<double> testThreads(int k)
     int iNumBlocks = k;
     Text* text = new Text("data/multiplied.txt", 1);
     int* iBlockSize = text -> blocktext(iNumBlocks);
-
     vector<thread> threads;
 
     int iInitial = 0;
@@ -98,11 +103,16 @@ std::chrono::duration<double> testThreads(int k)
 
     for (int i = 0; i < iNumBlocks; i++) {
         iFinal = iBlockSize[i];
-        threads.push_back(std::thread(countWordsCaller, text -> cText, iInitial, iFinal));
+        threads.push_back(std::thread(countWordsCaller, text -> cText, iInitial, iFinal, i));
         iInitial = iFinal;
     }
 
     for (auto& th : threads) th.join();
+
+    for (int i = 0; i < iNumBlocks; i++) {
+        COUNT_LOVE += arraCOUNT_LOVE[i];
+        COUNT_HATE += arraCOUNT_HATE[i];
+    }
 
     auto end = high_resolution_clock::now();
 

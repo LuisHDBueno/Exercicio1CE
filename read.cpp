@@ -50,7 +50,6 @@ class Text{
                 }
                 iChars++;
             }
-
             // Pegar o número de caracteres por bloco
             iBlockSize = new int[iBlocks];
             int iBlockLines = 0;
@@ -68,7 +67,7 @@ class Text{
                 }
             }
 
-            iBlockSize[iBlocks - 1] = iChars - iBlockSize[iBlocks - 2];
+            iBlockSize[iBlocks - 1] = iChars;
             return iBlockSize;
         }
 };
