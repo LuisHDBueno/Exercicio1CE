@@ -26,16 +26,16 @@ int main(){
 
     FILE* arq;
     arq = fopen("data//times.txt", "wt");
-    int repeats = 1;
+    int repeats = 20;
 
-    //std::chrono::duration<double> tempos[100];
     for (int i=1; i<21; i++){
         double tem = 0;
+        cout << "\nTestando com " << i << " threads" << endl;
         for (int r = 0; r<repeats; r++)
         {
+            cout << "Repeticao " << r << endl;
             std::chrono::duration<double> t = testThreads(i);
             tem += t.count();
-            //tempos[i] = t;
             COUNT_LOVE = 0;
             COUNT_HATE = 0;
             for (int j=0; j<i; j++){
@@ -97,13 +97,19 @@ int countWords(char *text, char *word, int iInitial, int iFinal){
 std::chrono::duration<double> testThreads(int k)
 {
     int iNumBlocks = k;
+
+    auto beginBlock = high_resolution_clock::now();
     Text* text = new Text("data/multiplied.txt", 1);
     int* iBlockSize = text -> blocktext(iNumBlocks);
+    auto endBlock = high_resolution_clock::now();
+    
+    cout << "Tempo de Preparacao: " << duration_cast<microseconds>(endBlock - beginBlock).count() << " microssegundos" << endl;
+    
     vector<thread> threads;
 
     int iInitial = 0;
     int iFinal = 0;
-    auto begin = high_resolution_clock::now();
+    auto beginCount = high_resolution_clock::now();
 
     for (int i = 0; i < iNumBlocks; i++) {
         iFinal = iBlockSize[i];
@@ -118,9 +124,28 @@ std::chrono::duration<double> testThreads(int k)
         COUNT_HATE += arraCOUNT_HATE[i];
     }
 
-    auto end = high_resolution_clock::now();
+    auto endCount = high_resolution_clock::now();
 
+    cout << "Tempo de Contagem: " << duration_cast<microseconds>(endCount - beginCount).count() << " microssegundos" << endl;
+
+    cout << "Tempo Total: " << duration_cast<microseconds>(endCount - beginCount + endBlock - beginBlock).count() << " microssegundos" << endl;
+
+    cout << "\t Thread " << 0 << " n char: " << iBlockSize[0] << endl;
+    for (int i = 1; i < iNumBlocks; i++) {
+        cout << "\t Thread " << i << ", n char: " << iBlockSize[i] -  iBlockSize[i - 1] << endl;
+    }
+
+    cout << "Love: " << COUNT_LOVE << endl;
+    cout << "Hate: " << COUNT_HATE << endl;
+    if (COUNT_LOVE > COUNT_HATE)
+    {
+        cout << "Love wins!" << endl;
+    }
+    else
+    {
+        cout << "Hate wins!" << endl;
+    }
     //return duration_cast<microseconds>(end - begin).count();
-    return std::chrono::duration<double>(duration_cast<microseconds>(end - begin).count() * microseconds::period::num / static_cast<double>(microseconds::period::den));
+    return std::chrono::duration<double>(duration_cast<microseconds>(endCount - beginCount).count() * microseconds::period::num / static_cast<double>(microseconds::period::den));
 
 }
