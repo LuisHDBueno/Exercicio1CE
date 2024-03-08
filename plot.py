@@ -15,10 +15,12 @@ def read_data_from_file(file_path):
 
 # Função para plotar o gráfico
 def plot_data(data):
-    plt.plot(data)  # Plota os dados
-    plt.title('Gráfico de Linha')
-    plt.xlabel('Índice')
-    plt.ylabel('Valor')
+    plt.title('Tempo necessário para executar diferentes threads em paralelo')
+    plt.xlabel('Threads')
+    plt.ylabel('Tempo')
+    plt.xticks(range(1, len(data)+1))  # Define os ticks do eixo x como números inteiros de 1 até o tamanho dos dados
+    plt.xlim(0, len(data)+1)  # Define os limites do eixo x de 1 até o tamanho dos dados
+    plt.plot(range(1, len(data)+1), data)  # Plota os dados
     
     # Verifica se a pasta 'fig' existe. Se não, cria a pasta.
     if not os.path.exists('fig'):

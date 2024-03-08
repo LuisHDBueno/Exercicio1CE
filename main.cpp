@@ -25,21 +25,26 @@ std::chrono::duration<double> testThreads(int k);
 int main(){
 
     FILE* arq;
-    arq = fopen("data//times.txt", "a");
+    arq = fopen("data//times.txt", "wt");
+    int repeats = 1;
 
-    std::chrono::duration<double> tempos[100];
-    for (int i=2; i<51; i++){
-        std::chrono::duration<double> t = testThreads(i);
-        double tem = t.count();
-        fprintf(arq, "%s", "\n");
-        fprintf(arq, "%f", tem);
-        tempos[i] = t;
-        COUNT_LOVE = 0;
-        COUNT_HATE = 0;
-        for (int j=0; j<i; j++){
-            arraCOUNT_LOVE[j] = 0;
-            arraCOUNT_HATE[j] = 0;
+    //std::chrono::duration<double> tempos[100];
+    for (int i=1; i<21; i++){
+        double tem = 0;
+        for (int r = 0; r<repeats; r++)
+        {
+            std::chrono::duration<double> t = testThreads(i);
+            tem += t.count();
+            //tempos[i] = t;
+            COUNT_LOVE = 0;
+            COUNT_HATE = 0;
+            for (int j=0; j<i; j++){
+                arraCOUNT_LOVE[j] = 0;
+                arraCOUNT_HATE[j] = 0;
+            }
         }
+        fprintf(arq, "%s", "\n");
+        fprintf(arq, "%f", tem/repeats);
     }
     fclose(arq);
     cout<<"Cabo"<<endl;
@@ -115,11 +120,6 @@ std::chrono::duration<double> testThreads(int k)
     }
 
     auto end = high_resolution_clock::now();
-
-    cout << "Love: " << COUNT_LOVE << endl;
-    cout << "Hate: " << COUNT_HATE << endl;
-
-    cout << "end" << endl;
 
     //return duration_cast<microseconds>(end - begin).count();
     return std::chrono::duration<double>(duration_cast<microseconds>(end - begin).count() * microseconds::period::num / static_cast<double>(microseconds::period::den));
