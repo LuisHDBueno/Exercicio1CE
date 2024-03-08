@@ -16,5 +16,5 @@
 - Para plotar o gráfico de tempo, basta executar o arquivo `plot.py` no terminal, o comando `python plot.py`.
 
 ## Relatório
-O relatório discutindo os resultados está disponível no arquivo `Relatório.pdf` na raiz do repositório.
+O relatório discutindo os resultados está disponível no arquivo `report.pdf` na raiz do repositório.
  

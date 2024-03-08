@@ -1,46 +1,37 @@
-# Primeiro, vamos criar um exemplo de script Python que faz o que você precisa.
-# Este script lerá um arquivo de texto contendo floats separados por novas linhas (\n)
-# e em seguida plotará um gráfico de linha com esses números.
-
-# Vamos supor que o arquivo de texto se chame 'data.txt' e esteja localizado no mesmo diretório do script.
 import os
 import matplotlib.pyplot as plt
 
 # Função para ler os dados do arquivo e converter em lista de floats
 def read_data_from_file(file_path):
     with open(file_path, 'r') as file:
-        data = file.read().splitlines()  # Lê o arquivo e divide em linhas
-        data = [float(i) for i in data if i]  # Converte cada linha para float
+        data = file.read().splitlines()
+        data = [float(i) for i in data if i]
     return data
 
 # Função para plotar o gráfico
-def plot_data(data):
-    plt.title('Tempo necessário para executar diferentes threads em paralelo')
+def plot_data(data, title, save_path):
+    plt.title(title)
     plt.xlabel('Threads')
-    plt.ylabel('Tempo')
-    plt.xticks(range(1, len(data)+1))  # Define os ticks do eixo x como números inteiros de 1 até o tamanho dos dados
-    plt.xlim(0, len(data)+1)  # Define os limites do eixo x de 1 até o tamanho dos dados
-    plt.plot(range(1, len(data)+1), data)  # Plota os dados
+    plt.ylabel('Tempo médio (s)')
+    plt.xticks(range(1, len(data)+1))
+    plt.xlim(0, len(data)+1)
+    plt.plot(range(1, len(data)+1), data)
     
-    # Verifica se a pasta 'fig' existe. Se não, cria a pasta.
     if not os.path.exists('fig'):
         os.makedirs('fig')
     
-    # Salva o gráfico na pasta 'fig' com o nome 'grafico_linha.png'
-    plt.savefig('fig/grafico_linha.png')
-    plt.close()  # Fecha a figura após salvar, liberando recursos
-    
-    print("Gráfico salvo em: fig/grafico_linha.png")
+    # Salva o gráfico na pasta 'fig'
+    plt.savefig(save_path)
+    plt.close()
 
 # Caminho para o arquivo de dados
 file_path = 'data//times.txt'
 
 # Ler os dados do arquivo
-data = read_data_from_file(file_path)
+data_count = read_data_from_file(file_path)
+data_block = read_data_from_file('data//block.txt')
+data_total = [data_count[i] + data_block[i] for i in range(len(data_count))]
 
 # Plotar os dados
-plot_data(data)
-
-# Este script deve ser salvo como um arquivo .py e executado em um ambiente que tenha acesso
-# ao matplotlib e seja capaz de exibir gráficos. Certifique-se de que o arquivo 'data.txt' esteja
-# no mesmo diretório do script, ou altere o caminho do arquivo conforme necessário.
+plot_data(data_count, 'Tempo necessário para contar as palavras com threads em paralelo', 'fig/grafico_count.png')
+plot_data(data_total, "Tempo total necessário para executar diferentes threads em paralelo", "fig/grafico_total.png")

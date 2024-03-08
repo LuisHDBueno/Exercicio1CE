@@ -3,8 +3,8 @@
 #include <vector>
 #include <windows.h>
 #include <chrono>
+#include <fstream>
 #include "read.cpp"
-#include<fstream>
 
 using std::cout;
 using std::endl;
