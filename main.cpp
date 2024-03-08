@@ -20,22 +20,29 @@ int arraCOUNT_HATE[100];
 
 void countWordsCaller(char *text, int iInitial, int iFinal, int threadNumber);
 int countWords(char *text, char *word, int iInitial, int iFinal);
-std::chrono::duration<double> testThreads(int k);
+void testThreads(int k, std::chrono::duration<double>* temp);
 
 int main(){
 
-    FILE* arq;
-    arq = fopen("data//times.txt", "wt");
+    FILE* arqWord;
+    FILE* arqBlock;
+    arqWord = fopen("data//times.txt", "wt");
+    arqBlock = fopen("data//block.txt", "wt");
     int repeats = 20;
 
     for (int i=1; i<21; i++){
-        double tem = 0;
+        double tempWord = 0;
+        double tempBlock = 0;
         cout << "\nTestando com " << i << " threads" << endl;
         for (int r = 0; r<repeats; r++)
         {
             cout << "Repeticao " << r << endl;
-            std::chrono::duration<double> t = testThreads(i);
-            tem += t.count();
+            std::chrono::duration<double> t[2];
+            testThreads(i, t);
+            // Tempo de contagem das palavras
+            tempWord += t[0].count();
+            // Tempo de preparação do texto
+            tempBlock += t[1].count();
             COUNT_LOVE = 0;
             COUNT_HATE = 0;
             for (int j=0; j<i; j++){
@@ -43,10 +50,13 @@ int main(){
                 arraCOUNT_HATE[j] = 0;
             }
         }
-        fprintf(arq, "%s", "\n");
-        fprintf(arq, "%f", tem/repeats);
+        fprintf(arqWord, "%s", "\n");
+        fprintf(arqWord, "%f", tempWord/repeats);
+        fprintf(arqBlock, "%s", "\n");
+        fprintf(arqBlock, "%f", tempBlock/repeats);
     }
-    fclose(arq);
+    fclose(arqWord);
+    fclose(arqBlock);
 }
 
 void countWordsCaller(char *text, int iInitial, int iFinal, int threadNumber){
@@ -94,7 +104,7 @@ int countWords(char *text, char *word, int iInitial, int iFinal){
     return wTimes;
 }
 
-std::chrono::duration<double> testThreads(int k)
+void testThreads(int k, std::chrono::duration<double>* temp)
 {
     int iNumBlocks = k;
 
@@ -145,7 +155,9 @@ std::chrono::duration<double> testThreads(int k)
     {
         cout << "Hate wins!" << endl;
     }
-    //return duration_cast<microseconds>(end - begin).count();
-    return std::chrono::duration<double>(duration_cast<microseconds>(endCount - beginCount).count() * microseconds::period::num / static_cast<double>(microseconds::period::den));
-
+    // Tempo de contagem das palavras
+    temp[0] = duration_cast<microseconds>(endCount - beginCount);
+    // Tempo de preparação do texto
+    temp[1] = duration_cast<microseconds>(endBlock - beginBlock);
+    return;
 }
