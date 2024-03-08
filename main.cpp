@@ -47,7 +47,6 @@ int main(){
         fprintf(arq, "%f", tem/repeats);
     }
     fclose(arq);
-    cout<<"Cabo"<<endl;
 }
 
 void countWordsCaller(char *text, int iInitial, int iFinal, int threadNumber){
